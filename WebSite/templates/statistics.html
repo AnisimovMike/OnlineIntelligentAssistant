@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+{% block p4 %}active{% endblock p4 %}
+{% block head_block %}
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current');   // Don't need to specify chart libraries!
+      google.charts.setOnLoadCallback(drawVisualization1);
+      google.charts.setOnLoadCallback(drawVisualization2);
+
+      function drawVisualization1() {
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'ColumnChart',
+          dataTable: [['', 'Краснодарский край', 'Москва', 'Московская область', 'Ленинградская область',
+                        'Санкт-Петербург', 'Крым', 'Татарстан', 'Свердловская область', 'Ставропольский край',
+                        'Тюменская область'],['', 16468251, 14466906, 14244986, 12991834, 7926519,
+                        5186208, 3118639, 3018512, 2421829, 2091512]],
+          options: {'title': 'Количество поездок'},
+          containerId: 'vis_div1'
+        });
+        wrapper.draw();
+      }
+      function drawVisualization2() {
+        var wrapper = new google.visualization.ChartWrapper({
+          chartType: 'ColumnChart',
+          dataTable: [['', 'Пляжный отдых', 'Лечение в санатории', 'Дома отдыха', 'Активный отдых',
+                        'Познавательный отдых', 'Дачный отдых', 'Отдых дома'],['', 51, 23, 19, 27, 42, 44, 42]],
+          options: {'title': 'Предпочитаемые виды отдыха'},
+          containerId: 'vis_div2'
+        });
+        wrapper.draw();
+      }
+    </script>
+
+{% endblock head_block %}
+{% block content %}
+
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'images/img_map.jpg' %}');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-end">
+          <div class="col-md-9 ftco-animate pb-5">
+          	<p class="breadcrumbs mb-2"><span class="mr-2"><a href="index.html">Домашняя страница <i class="ion-ios-arrow-forward"></i></a></span> <span>Блог <i class="ion-ios-arrow-forward"></i></span></p>
+            <h1 class="mb-0 bread">Блог</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row">
+    			<div class="col-md-8">
+    				<h5 class="font-weight-bold">Где граждане России отдыхают сегодня?</h5>
+    				<p>Росстат опубликовал данные по внутреннему туристическому потоку в стране за 9 месяцев 2023 года. Согласно им, турпоток в России вырос за год на 16,5%, что коррелируется с динамикой туроператорских продаж.</p>
+                    <p>Основными трендами развития внутреннего туризма станет приток самостоятельных туристов в соседние регионы страны, увеличение потока отдыхающих на сельские территории и повышенный интерес к кавказским регионам, а также Дальнему Востоку и Калининграду.</p>
+    			</div>
+    			<div class="col-md-4">
+    				<p>Согласно статистики культурно-познавательный отдых в России не выходил из топа самых популярных типов туризма последние 10 лет, а в 2023 вошел в топ 3 по популярности.</p>
+    			</div>
+    		</div>
+            <div class="row">
+                <h3>Самые популярные регионы</h3>
+                <div id="vis_div1" style="width: 1000px; height: 600px;"></div>
+            </div>
+            <div class="row">
+                <h3>Самые популярные виды отдыха в 2023</h3>
+                <div id="vis_div2" style="width: 1000px; height: 600px;"></div>
+            </div>
+    	</div>
+    </section>
+
+{% endblock content %}

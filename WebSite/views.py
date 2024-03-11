@@ -1,0 +1,206 @@
+from django.shortcuts import render, redirect
+from .models import Attractions, UserRoute
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, get_user_model
+from .forms import LoginForm, UserRegistrationForm, RouteForm
+
+
+import math
+import pandas as pd
+
+
+def index(request):
+    users_list = get_user_model().objects.all()
+    routs_list = UserRoute.objects.filter()
+    n1 = 0
+    n2 = len(users_list)
+    n3 = len(routs_list)
+    n4 = 0
+    numbers_list = [n1, n2, n3, n4]
+    data = {'numbers': numbers_list}
+    return render(request, "index.html", context=data)
+
+
+def about(request):
+    users_list = get_user_model().objects.all()
+    routs_list = UserRoute.objects.filter()
+    n1 = 0
+    n2 = len(users_list)
+    n3 = len(routs_list)
+    n4 = 0
+    numbers_list = [n1, n2, n3, n4]
+    data = {'numbers': numbers_list}
+    return render(request, "about.html", context=data)
+
+
+def gallery(request, sheet_id):
+    object_list = Attractions.objects.filter()
+    list_len = len(object_list)
+    n = math.ceil(list_len/9)
+    numbers = [x+1 for x in range(n)]
+    data_list = []
+    for i in range(9):
+        cur_id = (sheet_id-1)*9 + i
+        if cur_id < list_len:
+            link = str(object_list[cur_id].link)
+            img_link = f"images/{object_list[cur_id].img_link}"
+            name = str(object_list[cur_id].name)
+            cur_dict = {"link": link,
+                        "img_link": img_link,
+                        "name": name}
+            data_list.append(cur_dict)
+    data = {"collection": data_list, "numbers": numbers, "n": sheet_id}
+    return render(request, "gallery.html", context=data)
+
+
+def statistics(request):
+    return render(request, "statistics.html")
+
+
+def articles(request, article_id):
+    df_articles = pd.read_excel('./articles.xlsx', sheet_name=str(article_id))
+    df_articles = df_articles.fillna('-')
+    collection = []
+    h0 = ''
+    p0_1 = ''
+    p0_2 = ''
+    p0_3 = ''
+    for cur_index, row in df_articles.iterrows():
+        if cur_index == 0:
+            h0 = row['h']
+            p0_1 = row['p1']
+            p0_2 = row['p2']
+            p0_3 = row['p3']
+        else:
+            collection.append({'h': row['h'], 'p1': row['p1'], 'p2': row['p2'], 'p3': row['p3']})
+    data = {"h0": h0, "p0_1": p0_1, "p0_2": p0_2, "p0_3": p0_3, "collection": collection}
+    return render(request, "articles.html", context=data)
+
+
+@login_required
+def my_routs(request):
+    my_routs_list = UserRoute.objects.filter(user=request.user.id)
+    routs = []
+    for route in my_routs_list:
+        temp = {"name": route.route_name,
+                "city": route.city,
+                "text": route.route_text,
+                "id": route.id}
+        routs.append(temp)
+    data = {"routs": routs}
+    return render(request, "my_routs.html", context=data)
+
+
+def cur_route(request, route_id):
+    route = UserRoute.objects.get(id=route_id)
+    name = route.route_name
+    text = route.route_text
+    city = route.city
+    my_str = route.points_list
+    while True:
+        if '\r' in my_str:
+            my_str = my_str.replace('\r', '')
+        else:
+            break
+    points = eval(my_str)
+    collection = []
+    for cur in points:
+        print(cur)
+        point = cur
+        coordinates = 'нет'
+        description = 'нет'
+        temp = {"point": point,
+                "coordinates": coordinates,
+                "description": description}
+        collection.append(temp)
+    data = {"name": name, "city": city, "text": text, "collection": collection}
+    return render(request, "cur_route.html", context=data)
+
+
+def recommendations(request):
+    my_routs_list = UserRoute.objects.filter(user__is_superuser=1)
+    routs = []
+    for route in my_routs_list:
+        temp = {"name": route.route_name,
+                "city": route.city,
+                "text": route.route_text,
+                "id": route.id}
+        routs.append(temp)
+    data = {"routs": routs}
+    return render(request, "recommendations.html", context=data)
+
+
+def routing(request):
+    data = {}
+    return render(request, "routing.html", context=data)
+
+
+def send_mes(request):
+    name = request.POST.get("name", "Undefined")
+    gmail = request.POST.get("gmail", "Undefined")
+    theme = request.POST.get("theme", "Undefined")
+    mes = request.POST.get("mes", "Undefined")
+    print(name, gmail, theme, mes)
+    return redirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def new_route(request):
+    city_name = request.POST.get("city_name", "Undefined")
+    return redirect(f'/create_route/{city_name}')
+
+
+@login_required
+def create_route(request, city):
+    if request.method == 'POST':
+        points = request.POST.get("points", "Undefined")
+        route = UserRoute()
+        route.user = request.user
+        route.city = city
+        route.route_name = request.POST.get("route_name", "Undefined")
+        route.route_text = request.POST.get("route_text", "Undefined")
+        route.points_list = points.split("\n")
+        route.save()
+        return redirect('/my_routs')
+    else:
+        form = RouteForm()
+        data = {"city_name": city, "form": form}
+        return render(request, "new_route.html", context=data)
+
+
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    print(1)
+                    return redirect('.')
+                else:
+                    print(2)
+                    return redirect('.')
+            else:
+                print(3)
+                return redirect('.')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+
+def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            # Create a new user object but avoid saving it yet
+            new_user = user_form.save(commit=False)
+            # Set the chosen password
+            new_user.set_password(user_form.cleaned_data['password'])
+            # Save the User object
+            new_user.save()
+            return redirect('/user_login')
+    else:
+        user_form = UserRegistrationForm()
+    return render(request, 'register.html', {'user_form': user_form})

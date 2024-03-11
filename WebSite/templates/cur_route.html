@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row">
+    			<div class="col-md-8">
+    				<h5 class="font-weight-bold">{{ name }}</h5>
+    				<p>{{ text }}</p>
+    			</div>
+    			<div class="col-md-4">
+    				<p>{{ city }}</p>
+    			</div>
+    		</div>
+            {% for element in collection %}
+                <div class="row">
+                <h3>{{ element.point }}</h3>
+                </div>
+                <div class="row">
+                  <p>{{ element.coordinates }}</p>
+                </div>
+                <div class="row">
+                  <p>{{ element.description }}</p>
+                </div>
+            {% endfor %}
+    	</div>
+    </section>
+
+{% endblock content %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block p5 %}active{% endblock p5 %}
+{% block content %}
+
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'images/img_map.jpg' %}');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-end">
+          <div class="col-md-9 ftco-animate pb-5">
+          	<p class="breadcrumbs mb-2"><span class="mr-2"><a href="index.html">Домашняя страница <i class="ion-ios-arrow-forward"></i></a></span> <span>Мои маршруты <i class="ion-ios-arrow-forward"></i></span></p>
+            <h1 class="mb-0 bread">Мои маршруты</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <br>
+
+    <section class="ftco-section ftco-no-pt ftco-no-pb">
+        <div class="row justify-content-center mb-5 pb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+            <h1>{{ city_name }} - интересный город</h1>
+            <span class="subheading">Какие достопримечательности хочешь посетить?</span>
+          </div>
+        </div>
+    	<div class="container">
+            <div class="row">
+                <form method="POST" class="contact-form">
+                    {% csrf_token %}
+                <table>
+                    {{ form.as_table }}
+                </table>
+                <input type="submit" value="Создать" class="form-control submit px-3">
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <br><br>
+
+        <section class="ftco-section ftco-no-pt ftco-no-pb">
+        <div class="row justify-content-center mb-5 pb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+            <h1>Не знаешь что посмотреть?</h1>
+            <span class="subheading">Мы поможем!</span>
+          </div>
+        </div>
+        <div class="row justify-content-center mb-5 pb-3">
+            <p>1234</p>
+        </div>
+
+
+    </section>
+
+
+
+{% endblock content %}
