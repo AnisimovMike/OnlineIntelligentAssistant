@@ -24,6 +24,16 @@
                   <p>{{ element.description }}</p>
                 </div>
             {% endfor %}
+            <form method="post" action="/patch_route/{{ id }}" class="contact-form">
+              {% csrf_token %}
+              <div class="form-group d-flex">
+                {% if is_user %}
+                    <input type="submit" value="Изменить" name="_edit" class="submit px-3">
+                    <input type="submit" value="Удалить" name="_delete" class="submit px-3">
+                {% endif %}
+                <input type="submit" value="Построить" name="_make_route" class="submit px-3">
+              </div>
+            </form>
     	</div>
     </section>
 

@@ -7,6 +7,7 @@ from .forms import LoginForm, UserRegistrationForm, RouteForm
 
 import math
 import pandas as pd
+from Routing.coordinates import get_coordinates
 
 
 def index(request):
@@ -97,6 +98,10 @@ def cur_route(request, route_id):
     text = route.route_text
     city = route.city
     my_str = route.points_list
+    if route.user == request.user:
+        is_user = True
+    else:
+        is_user = False
     while True:
         if '\r' in my_str:
             my_str = my_str.replace('\r', '')
@@ -104,16 +109,31 @@ def cur_route(request, route_id):
             break
     points = eval(my_str)
     collection = []
+    coordinates_list = []
     for cur in points:
-        print(cur)
         point = cur
-        coordinates = 'нет'
-        description = 'нет'
+        try:
+            all_coordinates = get_coordinates(point)
+        except TimeoutError:
+            try:
+                all_coordinates = get_coordinates(point)
+            except TimeoutError:
+                return redirect('/my_routs')
+        if all_coordinates[0] is None:
+            coordinates = 'координаты не найдены'
+            description = 'проверьте правильность адреса или названия'
+            coordinates_list.append(None)
+        else:
+            coordinates = all_coordinates[0]
+            description = 'описание будет позже'
+            coordinates_list.append([all_coordinates[1], all_coordinates[2]])
         temp = {"point": point,
                 "coordinates": coordinates,
                 "description": description}
         collection.append(temp)
-    data = {"name": name, "city": city, "text": text, "collection": collection}
+    route.coordinates_list = coordinates_list
+    route.save()
+    data = {"name": name, "city": city, "text": text, "collection": collection, "id": route_id, "is_user": is_user}
     return render(request, "cur_route.html", context=data)
 
 
@@ -130,7 +150,41 @@ def recommendations(request):
     return render(request, "recommendations.html", context=data)
 
 
-def routing(request):
+def patch_route(request, route_id):
+    if request.POST:
+        if '_edit' in request.POST:
+            route = UserRoute.objects.get(id=route_id)
+            city = route.city
+            my_str = route.points_list
+            if route.user == request.user:
+                is_user = True
+            else:
+                is_user = False
+            while True:
+                if '\r' in my_str:
+                    my_str = my_str.replace('\r', '')
+                else:
+                    break
+            points = eval(my_str)
+            points_str = ''
+            for i in points:
+                points_str += i
+            form = RouteForm(initial={'route_name': route.route_name,
+                                      'route_text': route.route_text,
+                                      'points': points_str})
+            data = {"city_name": city, "form": form}
+            return render(request, "new_route.html", context=data)
+        elif '_delete' in request.POST:
+            route = UserRoute.objects.get(id=route_id)
+            route.delete()
+            return redirect('/my_routs')
+        elif '_make_route' in request.POST:
+            return redirect(f'/routing/{route_id}')
+    data = {}
+    return render(request, "routing.html", context=data)
+
+
+def routing(request, route_id):
     data = {}
     return render(request, "routing.html", context=data)
 
