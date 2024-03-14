@@ -15,3 +15,10 @@ class UserRoute(models.Model):
     route_text = models.CharField(max_length=500)
     points_list = models.TextField()
     coordinates_list = models.TextField(null=True, default=None)
+
+
+class UserMess(models.Model):
+    name = models.CharField(max_length=100)
+    gmail = models.CharField(max_length=50)
+    theme = models.CharField(max_length=100)
+    mes = models.TextField()

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Attractions, UserRoute
+from .models import Attractions, UserRoute, UserMess
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, get_user_model
 from .forms import LoginForm, UserRegistrationForm, RouteForm
@@ -8,6 +8,7 @@ from .forms import LoginForm, UserRegistrationForm, RouteForm
 import math
 import pandas as pd
 from Routing.coordinates import get_coordinates
+from Routing.do_routing import get_map
 from TextAnalysis.descriptions import get_description
 
 
@@ -185,17 +186,25 @@ def patch_route(request, route_id):
     return render(request, "routing.html", context=data)
 
 
-def routing(request, route_id):
+def routing(request, route_id=-1):
+    if route_id != -1:
+        route = UserRoute.objects.get(id=route_id)
+        city = route.city
+        coordinates = route.coordinates_list
+        coordinates = eval(coordinates)
+        map = get_map(city, coordinates)
+
     data = {}
     return render(request, "routing.html", context=data)
 
 
 def send_mes(request):
-    name = request.POST.get("name", "Undefined")
-    gmail = request.POST.get("gmail", "Undefined")
-    theme = request.POST.get("theme", "Undefined")
-    mes = request.POST.get("mes", "Undefined")
-    print(name, gmail, theme, mes)
+    user_mes = UserMess()
+    user_mes.name = request.POST.get("name", "Undefined")
+    user_mes.gmail = request.POST.get("gmail", "Undefined")
+    user_mes.theme = request.POST.get("theme", "Undefined")
+    user_mes.mes = request.POST.get("mes", "Undefined")
+    user_mes.save()
     return redirect(request.META['HTTP_REFERER'])
 
 

@@ -11,6 +11,7 @@ urlpatterns = [
     path('cur_route/<int:route_id>', views.cur_route),
     path('recommendations', views.recommendations),
     path('routing/<int:route_id>', views.routing),
+    path('routing', views.routing),
     path('send_mes', views.send_mes),
     path('new_route', views.new_route),
     path('create_route/<str:city>', views.create_route),
