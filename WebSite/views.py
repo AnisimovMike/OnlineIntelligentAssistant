@@ -8,6 +8,7 @@ from .forms import LoginForm, UserRegistrationForm, RouteForm
 import math
 import pandas as pd
 from Routing.coordinates import get_coordinates
+from TextAnalysis.descriptions import get_description
 
 
 def index(request):
@@ -125,7 +126,7 @@ def cur_route(request, route_id):
             coordinates_list.append(None)
         else:
             coordinates = all_coordinates[0]
-            description = 'описание будет позже'
+            description = get_description(point, city)
             coordinates_list.append([all_coordinates[1], all_coordinates[2]])
         temp = {"point": point,
                 "coordinates": coordinates,
