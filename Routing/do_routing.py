@@ -20,3 +20,4 @@ def get_map(city, coordinates):
     nodes_list = parse_coordinates(graph, coordinates)
     result_path = find_path(graph, nodes_list, optimizer)
     shortest_route_map = ox.plot_route_folium(graph, result_path)
+    return shortest_route_map
