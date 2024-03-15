@@ -35,7 +35,7 @@ def find_path(graph, nodes_list, optimizer):
     for i in range(n - 1):
         for j in range(n - 1, i, -1):
             cur_shortest_path = nx.shortest_path(graph, nodes_list[i], nodes_list[j], weight=optimizer)
-            cur_shortest_length = nx.path_weight(graph, cur_shortest_path, weight='weight')
+            cur_shortest_length = nx.path_weight(graph, cur_shortest_path,  weight=optimizer)
             my_graph.add_edge(nodes_list[i], nodes_list[j], weight=float(cur_shortest_length))
             matrix[i][j] = cur_shortest_length
             matrix[j][i] = cur_shortest_length
@@ -76,9 +76,6 @@ def find_path(graph, nodes_list, optimizer):
 
         oldIndex1 = Str[index1]
         oldIndex2 = Stb[index2]
-        print(oldIndex1)
-        print(oldIndex2)
-        print(res)
         if oldIndex2 in Str and oldIndex1 in Stb:
             NewIndex1 = Str.index(oldIndex2)
             NewIndex2 = Stb.index(oldIndex1)
@@ -86,7 +83,8 @@ def find_path(graph, nodes_list, optimizer):
         del Str[index1]
         del Stb[index2]
         matrix = Delete(matrix, index1, index2)
-        if len(matrix) == 1: break
+        if len(matrix) == 1:
+            break
 
     for i in range(0, len(res) - 1, 2):
         if res.count(res[i]) < 2:
@@ -113,5 +111,7 @@ def find_path(graph, nodes_list, optimizer):
     for i in range(0, len(result) - 1, 2):
         start_index = int(result[i])
         end_index = int(result[i + 1])
-        result_path.append(path_matrix[start_index - 1][end_index - 1])
+        new_path = path_matrix[start_index - 1][end_index - 1]
+        deleted_element = new_path.pop(len(new_path) - 1)
+        result_path += new_path
     return result_path

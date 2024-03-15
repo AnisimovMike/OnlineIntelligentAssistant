@@ -194,7 +194,6 @@ def routing(request, route_id=-1):
         coordinates = eval(coordinates)
         cur_map = get_map(city, coordinates)
         cur_map.save('map.html')
-
     data = {"map_src": "map.html"}
     return render(request, "routing.html", context=data)
 
