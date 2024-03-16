@@ -29,3 +29,5 @@ class RouteForm(forms.Form):
                                  widget=forms.TextInput(attrs={'placeholder': 'Описание'}))
     points = forms.CharField(label="Достопримечательности", widget=forms.Textarea(
         attrs={'placeholder': 'Адрес или название 1\nАдрес или название 2\nАдрес или название 3\nи т.д.'}))
+    route_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+

@@ -12,13 +12,16 @@ from Routing.do_routing import get_map
 from TextAnalysis.descriptions import get_description
 
 
+routs_number = 0
+
+
 def index(request):
     users_list = get_user_model().objects.all()
     routs_list = UserRoute.objects.filter()
     n1 = 0
     n2 = len(users_list)
     n3 = len(routs_list)
-    n4 = 0
+    n4 = routs_number
     numbers_list = [n1, n2, n3, n4]
     data = {'numbers': numbers_list}
     return render(request, "index.html", context=data)
@@ -30,7 +33,7 @@ def about(request):
     n1 = 0
     n2 = len(users_list)
     n3 = len(routs_list)
-    n4 = 0
+    n4 = routs_number
     numbers_list = [n1, n2, n3, n4]
     data = {'numbers': numbers_list}
     return render(request, "about.html", context=data)
@@ -173,7 +176,8 @@ def patch_route(request, route_id):
                 points_str += i
             form = RouteForm(initial={'route_name': route.route_name,
                                       'route_text': route.route_text,
-                                      'points': points_str})
+                                      'points': points_str,
+                                      'route_id': route_id})
             data = {"city_name": city, "form": form}
             return render(request, "new_route.html", context=data)
         elif '_delete' in request.POST:
@@ -182,11 +186,40 @@ def patch_route(request, route_id):
             return redirect('/my_routs')
         elif '_make_route' in request.POST:
             return redirect(f'/routing/{route_id}')
-    data = {}
-    return render(request, "routing.html", context=data)
+        else:
+            route_id = request.POST.get("route_id", -1)
+            route = UserRoute.objects.get(id=route_id)
+            points = request.POST.get("points", "Undefined")
+            route.route_name = request.POST.get("route_name", "Undefined")
+            route.route_text = request.POST.get("route_text", "Undefined")
+            route.points_list = points.split("\n")
+            route.save()
+            return redirect('/my_routs')
+    return redirect('/')
+
+
+def choose_route(request):
+    my_routs_list = UserRoute.objects.filter(user=request.user.id)
+    routs = []
+    for route in my_routs_list:
+        temp = {"name": route.route_name,
+                "city": route.city,
+                "text": route.route_text,
+                "id": route.id}
+        routs.append(temp)
+    recommendations_routs_list = UserRoute.objects.filter(user__is_superuser=1)
+    for route in recommendations_routs_list:
+        temp = {"name": route.route_name,
+                "city": route.city,
+                "text": route.route_text,
+                "id": route.id}
+        routs.append(temp)
+    data = {"routs": routs}
+    return render(request, "choose_route.html", context=data)
 
 
 def routing(request, route_id=-1):
+    global routs_number
     if route_id != -1:
         route = UserRoute.objects.get(id=route_id)
         city = route.city
@@ -195,6 +228,7 @@ def routing(request, route_id=-1):
         cur_map = get_map(city, coordinates)
         cur_map.save('map.html')
     data = {"map_src": "map.html"}
+    routs_number += 1
     return render(request, "routing.html", context=data)
 
 
@@ -254,7 +288,7 @@ def user_login(request):
     return render(request, 'login.html', {'form': form})
 
 
-def register(request):
+def registration(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
