@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Log-in{% endblock %}
 {% block content %}
-    <h1>Авторизация</h1>
-    <p>Для использования этой функции нужно пройти авторизацию в этой форме:</p>
-    <form action="/login" method="POST">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <p><input type="submit" value="Войти"></p>
-    </form>
-    <p><a href="/registration">Зарегистрироваться</a></p>
+    <section class="ftco-section ftco-no-pt ftco-no-pb">
+        <div class="row justify-content-center mb-5 pb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+            <h1>Авторизация</h1>
+            <p>Для использования этой функции нужно пройти авторизацию в этой форме:</p>
+          </div>
+        </div>
+    	<div class="container">
+            <div class="row">
+                <form action="/login" method="POST">
+                    <table>
+                        {{ form.as_table }}
+                    </table>
+                    {% csrf_token %}
+                    <p><input type="submit" value="Войти"></p>
+                </form>
+            </div>
+            <p><a href="/registration">Зарегистрироваться</a></p>
+        </div>
+    </section>
 {% endblock %}

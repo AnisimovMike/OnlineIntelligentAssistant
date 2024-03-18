@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Create an account{% endblock %}
+
+{% block content %}
+    <section class="ftco-section ftco-no-pt ftco-no-pb">
+        <div class="row justify-content-center mb-5 pb-3">
+          <div class="col-md-7 heading-section text-center ftco-animate">
+            <h1>Создайте аккаунт</h1>
+            <p>Зарегистрируйтесь, используя эту форму:</p>
+          </div>
+        </div>
+    	<div class="container">
+            <div class="row">
+                <form action="/register" method="post">
+                    <table>
+                        {{ user_form.as_table }}
+                    </table>
+                    {% csrf_token %}
+                    <p><input type="submit" value="Создать аккаунт"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

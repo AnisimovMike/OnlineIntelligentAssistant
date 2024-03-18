@@ -22,6 +22,15 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
 
 
+class AttractionForm(forms.Form):
+    name = forms.CharField(label='название')
+    img_link = forms.CharField(label='ссылка на картинку')
+    address = forms.CharField(label='адрес', required=False)
+    latitude = forms.CharField(label='latitude', required=False)
+    longitude = forms.CharField(label='longitude', required=False)
+    short_description = forms.CharField(widget=forms.Textarea(), label='описание', required=False)
+
+
 class RouteForm(forms.Form):
     route_name = forms.CharField(label='Название маршрута', max_length=100,
                                  widget=forms.TextInput(attrs={'placeholder': 'Мой маршрут'}))

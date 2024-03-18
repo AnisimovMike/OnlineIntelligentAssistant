@@ -3,7 +3,16 @@ import networkx as nx
 from Routing.routing import find_path
 
 
-def parse_coordinates(graph, coordinates_list):
+print('Загружаю карту')
+place = f'Москва, Россия'
+mode = 'walk'
+optimizer = 'length'
+#graph = ox.graph_from_place(place, network_type=mode)
+print('Карта загружена')
+
+
+def parse_coordinates(coordinates_list):
+    global graph
     nodes_list = []
     for point in coordinates_list:
         if point is not None:
@@ -12,12 +21,9 @@ def parse_coordinates(graph, coordinates_list):
     return nodes_list
 
 
-def get_map(city, coordinates):
-    place = f'{city}, Россия'
-    mode = 'walk'
-    optimizer = 'length'
-    graph = ox.graph_from_place(place, network_type=mode)
-    nodes_list = parse_coordinates(graph, coordinates)
+def get_map(coordinates):
+    global graph
+    nodes_list = parse_coordinates(coordinates)
     result_path = find_path(graph, nodes_list, optimizer)
     shortest_route_map = ox.plot_route_folium(graph, result_path)
     return shortest_route_map

@@ -18,5 +18,7 @@ urlpatterns = [
     path('patch_route/<int:route_id>', views.patch_route),
     path('login', views.user_login),
     path('registration', views.registration),
+    path('add_attraction', views.add_attraction),
+    path('create_tags', views.create_tags),
     re_path('^.', views.index),
 ]

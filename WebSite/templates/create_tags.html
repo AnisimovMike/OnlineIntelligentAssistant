@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+    <section class="ftco-section">
+    	<div class="container">
+
+            <form method="post" action="/create_tags" class="contact-form">
+              {% csrf_token %}
+              <div class="form-group d-flex">
+                <input type="submit" value="monument" name="_monument" class="submit px-3">
+                <input type="submit" value="parks" name="_parks" class="submit px-3">
+                <input type="submit" value="location" name="_location" class="submit px-3">
+              </div>
+            </form>
+    	</div>
+    </section>
+
+
+{% endblock content %}
