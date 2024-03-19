@@ -14,11 +14,12 @@ urlpatterns = [
     path('routing', views.choose_route),
     path('send_mes', views.send_mes),
     path('new_route', views.new_route),
-    path('create_route/<str:city>', views.create_route),
+    path('create_route/Москва', views.create_route),
     path('patch_route/<int:route_id>', views.patch_route),
     path('login', views.user_login),
     path('registration', views.registration),
     path('add_attraction', views.add_attraction),
     path('create_tags', views.create_tags),
+    path('attraction/<int:attraction_id>', views.attraction),
     re_path('^.', views.index),
 ]

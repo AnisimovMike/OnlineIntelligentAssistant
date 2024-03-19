@@ -1,6 +1,72 @@
 {% extends "base.html" %}
 {% load static %}
 {% block p5 %}active{% endblock p5 %}
+{% block head_block %}
+    <style>
+    .monument, .parks, .div_location1, .div_location2, .div_location3,
+    .div_location4, .div_location5, .div_location6,
+    .div_location7, .div_location8, .div_location9,
+    .div_location10, .div_location11, .div_location1{
+        display: none;
+    }
+
+    input#monument:checked~.monument {
+        display: block;
+    }
+
+    input#parks:checked~.parks {
+        display: block;
+    }
+
+    input#location1:checked~.div_location1 {
+        display: block;
+    }
+
+    input#location2:checked~.div_location2 {
+        display: block;
+    }
+
+    input#location3:checked~.div_location3 {
+        display: block;
+    }
+
+    input#location4:checked~.div_location4 {
+        display: block;
+    }
+
+    input#location5:checked~.div_location5 {
+        display: block;
+    }
+
+    input#location6:checked~.div_location6 {
+        display: block;
+    }
+
+    input#location7:checked~.div_location7 {
+        display: block;
+    }
+
+    input#location8:checked~.div_location8 {
+        display: block;
+    }
+
+    input#location9:checked~.div_location9 {
+        display: block;
+    }
+
+    input#location10:checked~.div_location10 {
+        display: block;
+    }
+
+    input#location11:checked~.div_location11 {
+        display: block;
+    }
+
+    input#location12:checked~.div_location12 {
+        display: block;
+    }
+    </style>
+{% endblock head_block %}
 {% block content %}
 
     <section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'images/img_map.jpg' %}');" data-stellar-background-ratio="0.5">
@@ -38,19 +104,306 @@
     </section>
 
     <br><br>
-    <!--
+
     <section class="ftco-section ftco-no-pt ftco-no-pb">
-        <div class="row justify-content-center mb-5 pb-3">
-          <div class="col-md-7 heading-section text-center ftco-animate">
-            <h1>Не знаешь что посмотреть?</h1>
-            <span class="subheading">Мы поможем!</span>
-          </div>
-        </div>
-        <div class="row justify-content-center mb-5 pb-3">
-            <p>список</p>
-        </div>
+    	<div class="container">
+            <div class="col-md-12 pl-md-5">
+    			<div class="row justify-content-start py-5">
+		          <div class="col-md-12 heading-section ftco-animate pl-md-4 py-md-4">
+		          	<span class="subheading">Не знаешь что посмотреть?</span>
+		            <h2 class="mb-4">Мы подобрали интересные варианты</h2>
+		            <p>Выберите метод фильтрации</p>
+		            <div class="tabulation-2 mt-4">
+                        <ul class="nav nav-pills nav-fill d-md-flex d-block">
+                          <li class="nav-item mb-md-0 mb-2">
+                            <a class="nav-link active py-2" data-toggle="tab" href="#home1">Все</a>
+                          </li>
+                          <li class="nav-item px-lg-2 mb-md-0 mb-2">
+                            <a class="nav-link py-2" data-toggle="tab" href="#home2">По тэгу</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link py-2 mb-md-0 mb-2" data-toggle="tab" href="#home3">По расположению</a>
+                          </li>
+                        </ul>
+                        <div class="tab-content bg-light rounded mt-2">
+                          <div class="tab-pane container p-0 active" id="home1">
+                            {% for element in collection %}
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                        <p>{{ element.address }}</p>
+                                        <p>{{ element.tags }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p>{{ element.city }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                          </div>
+                          <div class="tab-pane container p-0 fade" id="home2">
+                              <input type="radio" name="tags" id="monument" checked>
+                              <label for="monument">monument</label>
+                              <br>
+                              <input type="radio" name="tags" id="parks">
+                              <label for="parks">parks</label>
+                              <div class="monument">
+                                  {% for element in collection %}
+                                      {% if "monument" in element.tags %}
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                                <p>{{ element.address }}</p>
+                                                <p>{{ element.tags }}</p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p>{{ element.city }}</p>
+                                            </div>
+                                        </div>
+                                      {% endif %}
+                                  {% endfor %}
+                              </div>
+                              <div class="parks">
+                                  {% for element in collection %}
+                                      {% if "parks" in element.tags %}
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                                <p>{{ element.address }}</p>
+                                                <p>{{ element.tags }}</p>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p>{{ element.city }}</p>
+                                            </div>
+                                        </div>
+                                      {% endif %}
+                                  {% endfor %}
+                              </div>
+                          </div>
+                          <div class="tab-pane container p-0 fade" id="home3">
+                            <input type="radio" name="location" id="location1" checked>
+                            <label for="location1">Центральный</label><br>
+                            <input type="radio" name="location" id="location2">
+                            <label for="location2">Северный</label><br>
+                            <input type="radio" name="location" id="location3">
+                            <label for="location3">Северо-Восточный</label><br>
+                            <input type="radio" name="location" id="location4">
+                            <label for="location4">Восточный</label><br>
+                            <input type="radio" name="location" id="location5">
+                            <label for="location5">Юго-Восточный</label><br>
+                            <input type="radio" name="location" id="location6">
+                            <label for="location6">Южный</label><br>
+                            <input type="radio" name="location" id="location7">
+                            <label for="location7">Юго-Западный</label><br>
+                            <input type="radio" name="location" id="location8">
+                            <label for="location8">Западный</label><br>
+                            <input type="radio" name="location" id="location9">
+                            <label for="location9">Северо-Западный</label>
+                            <input type="radio" name="location" id="location10">
+                            <label for="location10">Зеленоград</label>
+                            <input type="radio" name="location" id="location11">
+                            <label for="location11">Троицкий</label>
+                            <input type="radio" name="location" id="location12">
+                            <label for="location12">Новомосковский</label>
+                            <div class="div_location1">
+                                {% for element in collection %}
+                                  {% if "div_location1" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location2">
+                                {% for element in collection %}
+                                  {% if "div_location2" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location3">
+                                {% for element in collection %}
+                                  {% if "div_location3" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location4">
+                                {% for element in collection %}
+                                  {% if "div_location4" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location5">
+                                {% for element in collection %}
+                                  {% if "div_location5" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location6">
+                                {% for element in collection %}
+                                  {% if "div_location6" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location7">
+                                {% for element in collection %}
+                                  {% if "div_location7" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location8">
+                                {% for element in collection %}
+                                  {% if "div_location8" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location9">
+                                {% for element in collection %}
+                                  {% if "div_location9" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location10">
+                                {% for element in collection %}
+                                  {% if "div_location10" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location11">
+                                {% for element in collection %}
+                                  {% if "div_location11" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="div_location12">
+                                {% for element in collection %}
+                                  {% if "div_location12" in element.tags %}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h5 class="font-weight-bold">{{ element.name }}</h5>
+                                            <p>{{ element.address }}</p>
+                                            <p>{{ element.tags }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p>{{ element.city }}</p>
+                                        </div>
+                                    </div>
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+		          </div>
+		        </div>
+	        </div>
+    	</div>
     </section>
-    -->
 
 
 

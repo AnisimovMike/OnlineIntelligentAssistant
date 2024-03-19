@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, get_user_model
 from .models import Attractions, AttractionTags, UserRoute, RouteAttractions, UserMess
 from .forms import LoginForm, UserRegistrationForm, RouteForm, AttractionForm
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 
 import math
@@ -44,14 +45,14 @@ def about(request):
 def gallery(request, sheet_id):
     object_list = Attractions.objects.filter()
     list_len = len(object_list)
-    n = math.ceil(list_len/9)
+    n = math.ceil(list_len/12)
     numbers = [x+1 for x in range(n)]
     data_list = []
-    for i in range(9):
-        cur_id = (sheet_id-1)*9 + i
+    for i in range(12):
+        cur_id = (sheet_id-1)*12 + i
         if cur_id < list_len:
-            link = str(object_list[cur_id].link)
-            img_link = f"images/{object_list[cur_id].img_link}"
+            link = f'/attraction/{object_list[cur_id].id}'
+            img_link = f"images/attraction/{object_list[cur_id].img_link}"
             name = str(object_list[cur_id].name)
             cur_dict = {"link": link,
                         "img_link": img_link,
@@ -59,6 +60,20 @@ def gallery(request, sheet_id):
             data_list.append(cur_dict)
     data = {"collection": data_list, "numbers": numbers, "n": sheet_id}
     return render(request, "gallery.html", context=data)
+
+
+def attraction(request, attraction_id):
+    try:
+        cur_attraction = Attractions.objects.get(id=attraction_id)
+        name = cur_attraction.name
+        img_link = f"images/attraction/{cur_attraction.img_link}"
+        print(img_link)
+        description = cur_attraction.short_description
+        data = {"name": name, "img_link": img_link, "description": description}
+        return render(request, "attraction.html", context=data)
+    except ObjectDoesNotExist:
+        redirect('/')
+
 
 
 def statistics(request):
@@ -100,46 +115,22 @@ def my_routs(request):
 
 
 def cur_route(request, route_id):
+    global city
     route = UserRoute.objects.get(id=route_id)
+    route_attractions_list = RouteAttractions.objects.filter(route=route_id)
     name = route.route_name
     text = route.route_text
-    city = route.city
-    my_str = route.points_list
     if route.user == request.user:
         is_user = True
     else:
         is_user = False
-    while True:
-        if '\r' in my_str:
-            my_str = my_str.replace('\r', '')
-        else:
-            break
-    points = eval(my_str)
     collection = []
-    coordinates_list = []
-    for cur in points:
-        point = cur
-        try:
-            all_coordinates = get_coordinates(point)
-        except TimeoutError:
-            try:
-                all_coordinates = get_coordinates(point)
-            except TimeoutError:
-                return redirect('/my_routs')
-        if all_coordinates[0] is None:
-            coordinates = 'координаты не найдены'
-            description = 'проверьте правильность адреса или названия'
-            coordinates_list.append(None)
-        else:
-            coordinates = all_coordinates[0]
-            description = get_description(point, city)
-            coordinates_list.append([all_coordinates[1], all_coordinates[2]])
-        temp = {"point": point,
-                "coordinates": coordinates,
-                "description": description}
+    for cur_object in route_attractions_list:
+        cur_attraction = Attractions.objects.get(id=cur_object.attraction)
+        temp = {"point": cur_attraction.name,
+                "address": cur_attraction.address,
+                "description": cur_attraction.short_description}
         collection.append(temp)
-    route.coordinates_list = coordinates_list
-    route.save()
     data = {"name": name, "city": city, "text": text, "collection": collection, "id": route_id, "is_user": is_user}
     return render(request, "cur_route.html", context=data)
 
@@ -251,7 +242,8 @@ def new_route(request):
 
 
 @login_required
-def create_route(request, city):
+def create_route(request):
+    global city
     if request.method == 'POST':
         points = request.POST.get("points", "Undefined")
         route = UserRoute()
@@ -264,7 +256,19 @@ def create_route(request, city):
         return redirect('/my_routs')
     else:
         form = RouteForm()
-        data = {"city_name": city, "form": form}
+        object_list = Attractions.objects.filter()
+        collection = []
+        for cur_obj in object_list:
+            tags = AttractionTags.objects.filter(attraction=cur_obj.id)
+            tags_list = [cur_tag.tag for cur_tag in tags]
+            name = cur_obj.name
+            address = cur_obj.address
+            temp = {"name": name,
+                    "address": address,
+                    "tags": tags_list,
+                    "city": city}
+            collection.append(temp)
+        data = {"city_name": city, "form": form, "collection": collection}
         return render(request, "new_route.html", context=data)
 
 
@@ -362,7 +366,7 @@ def add_attraction(request):
 def create_tags(request):
     if request.POST:
         if '_monument' in request.POST:
-            monument_names_list = ['памятник', 'монумент', 'бюст', 'фонтан']
+            monument_names_list = ['памятник', 'монумент', 'бюст', 'скульптура', 'фонтан']
             create_tag_monument(monument_names_list, 'monument')
         elif '_parks' in request.POST:
             monument_names_list = ['парк', 'сад']
