@@ -11,7 +11,7 @@ import pandas as pd
 from Routing.coordinates import get_coordinates
 from Routing.do_routing import get_map
 from TextAnalysis.descriptions import get_description
-from TextAnalysis.create_tags import create_tag_monument
+from TextAnalysis.create_tags import create_tag_by_name, create_tag_location
 
 
 routs_number = 0
@@ -73,7 +73,6 @@ def attraction(request, attraction_id):
         return render(request, "attraction.html", context=data)
     except ObjectDoesNotExist:
         redirect('/')
-
 
 
 def statistics(request):
@@ -245,14 +244,31 @@ def new_route(request):
 def create_route(request):
     global city
     if request.method == 'POST':
-        points = request.POST.get("points", "Undefined")
         route = UserRoute()
         route.user = request.user
         route.city = city
-        route.route_name = request.POST.get("route_name", "Undefined")
-        route.route_text = request.POST.get("route_text", "Undefined")
-        route.points_list = points.split("\n")
+        route.route_name = request.POST.get("route_name")
+        route.route_text = request.POST.get("route_text")
         route.save()
+        route_id = route.id
+        points = request.POST.get("points")
+        for point in points.split("\n"):
+            cur_point = point.split(" ")[0][:-1]
+            try:
+                cur_point = int(cur_point)
+                try:
+                    old_route_attractions = RouteAttractions.objects.get(route=route_id, attraction=cur_point)
+                except ObjectDoesNotExist:
+                    try:
+                        cur_attraction = Attractions.objects.get(id=cur_point)
+                        route_attractions = RouteAttractions()
+                        route_attractions.route = route
+                        route_attractions.attraction = cur_attraction
+                        route_attractions.save()
+                    except ObjectDoesNotExist:
+                        pass
+            except ValueError:
+                pass
         return redirect('/my_routs')
     else:
         form = RouteForm()
@@ -263,10 +279,12 @@ def create_route(request):
             tags_list = [cur_tag.tag for cur_tag in tags]
             name = cur_obj.name
             address = cur_obj.address
+            cur_id = cur_obj.id
             temp = {"name": name,
                     "address": address,
                     "tags": tags_list,
-                    "city": city}
+                    "city": city,
+                    "id": cur_id}
             collection.append(temp)
         data = {"city_name": city, "form": form, "collection": collection}
         return render(request, "new_route.html", context=data)
@@ -367,10 +385,10 @@ def create_tags(request):
     if request.POST:
         if '_monument' in request.POST:
             monument_names_list = ['памятник', 'монумент', 'бюст', 'скульптура', 'фонтан']
-            create_tag_monument(monument_names_list, 'monument')
+            create_tag_by_name(monument_names_list, 'monument')
         elif '_parks' in request.POST:
             monument_names_list = ['парк', 'сад']
-            create_tag_monument(monument_names_list, 'parks')
+            create_tag_by_name(monument_names_list, 'parks')
         elif '_location' in request.POST:
-            print(3)
+            create_tag_location()
     return render(request, 'create_tags.html')
