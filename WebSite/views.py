@@ -187,7 +187,7 @@ def patch_route(request, route_id):
         elif '_make_route' in request.POST:
             return redirect(f'/routing/{route_id}')
         else:
-            route_id = request.route_id
+            route_id = request.POST.get("route_id")
             route = UserRoute.objects.get(id=route_id)
             route.city = city
             route.route_name = request.POST.get("route_name")
@@ -206,17 +206,18 @@ def patch_route(request, route_id):
                 if cur_id in new_attractions_list:
                     new_attractions_list.remove(cur_id)
                 else:
-                    route_attractions = RouteAttractions.objects.get(route=route_id, attraction=cur_object.attraction)
+                    route_attraction = RouteAttractions.objects.get(route=route_id, attraction=cur_object.attraction)
+                    route_attraction.delete()
             if len(new_attractions_list) != 0:
                 for cur_attraction in new_attractions_list:
                     try:
                         cur_point = int(cur_attraction)
                         try:
                             cur_attraction = Attractions.objects.get(id=cur_point)
-                            route_attractions = RouteAttractions()
-                            route_attractions.route = route
-                            route_attractions.attraction = cur_attraction
-                            route_attractions.save()
+                            route_attraction = RouteAttractions()
+                            route_attraction.route = route
+                            route_attraction.attraction = cur_attraction
+                            route_attraction.save()
                         except ObjectDoesNotExist:
                             pass
                     except ValueError:
@@ -246,14 +247,14 @@ def choose_route(request):
 
 
 def routing(request, route_id=-1):
+    global city
     global routs_number
     if route_id != -1:
-        route = UserRoute.objects.get(id=route_id)
-        city = route.city
-        coordinates = route.coordinates_list
-        coordinates = eval(coordinates)
-        cur_map = get_map(coordinates)
-        cur_map.save('map.html')
+        route_attractions_list = RouteAttractions.objects.filter(route=route_id)
+
+
+        #cur_map = get_map(coordinates)
+        #cur_map.save('map.html')
     data = {"map_src": "map.html"}
     routs_number += 1
     return render(request, "routing.html", context=data)
