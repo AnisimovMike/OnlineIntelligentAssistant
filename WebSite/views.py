@@ -125,7 +125,7 @@ def cur_route(request, route_id):
         is_user = False
     collection = []
     for cur_object in route_attractions_list:
-        cur_attraction = Attractions.objects.get(id=cur_object.attraction)
+        cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
         temp = {"point": cur_attraction.name,
                 "address": cur_attraction.address,
                 "description": cur_attraction.short_description}
@@ -135,9 +135,9 @@ def cur_route(request, route_id):
 
 
 def recommendations(request):
-    my_routs_list = UserRoute.objects.filter(user__is_superuser=1)
+    recommendations_routs_list = UserRoute.objects.filter(user__is_superuser=1)
     routs = []
-    for route in my_routs_list:
+    for route in recommendations_routs_list:
         temp = {"name": route.route_name,
                 "city": route.city,
                 "text": route.route_text,
@@ -148,29 +148,37 @@ def recommendations(request):
 
 
 def patch_route(request, route_id):
+    global city
     if request.POST:
         if '_edit' in request.POST:
             route = UserRoute.objects.get(id=route_id)
-            city = route.city
-            my_str = route.points_list
-            if route.user == request.user:
-                is_user = True
-            else:
-                is_user = False
-            while True:
-                if '\r' in my_str:
-                    my_str = my_str.replace('\r', '')
-                else:
-                    break
-            points = eval(my_str)
+            route_attractions_list = RouteAttractions.objects.filter(route=route_id)
             points_str = ''
-            for i in points:
-                points_str += i
+            for cur_object in route_attractions_list:
+                cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
+                cur_id = cur_attraction.id
+                cur_name = cur_attraction.name
+                points_str += f'{cur_id}) {cur_name}\n'
+
             form = RouteForm(initial={'route_name': route.route_name,
                                       'route_text': route.route_text,
                                       'points': points_str,
                                       'route_id': route_id})
-            data = {"city_name": city, "form": form}
+            object_list = Attractions.objects.filter()
+            collection = []
+            for cur_obj in object_list:
+                tags = AttractionTags.objects.filter(attraction=cur_obj.id)
+                tags_list = [cur_tag.tag for cur_tag in tags]
+                name = cur_obj.name
+                address = cur_obj.address
+                cur_id = cur_obj.id
+                temp = {"name": name,
+                        "address": address,
+                        "tags": tags_list,
+                        "city": city,
+                        "id": cur_id}
+                collection.append(temp)
+            data = {"city_name": city, "form": form, "collection": collection}
             return render(request, "new_route.html", context=data)
         elif '_delete' in request.POST:
             route = UserRoute.objects.get(id=route_id)
@@ -179,13 +187,40 @@ def patch_route(request, route_id):
         elif '_make_route' in request.POST:
             return redirect(f'/routing/{route_id}')
         else:
-            route_id = request.POST.get("route_id", -1)
+            route_id = request.route_id
             route = UserRoute.objects.get(id=route_id)
-            points = request.POST.get("points", "Undefined")
-            route.route_name = request.POST.get("route_name", "Undefined")
-            route.route_text = request.POST.get("route_text", "Undefined")
-            route.points_list = points.split("\n")
+            route.city = city
+            route.route_name = request.POST.get("route_name")
+            route.route_text = request.POST.get("route_text")
             route.save()
+            points = request.POST.get("points")
+            new_attractions_list = []
+            for point in points.split("\n"):
+                cur_point = point.split(" ")[0][:-1]
+                new_attractions_list.append(cur_point)
+            route_attractions_list = RouteAttractions.objects.filter(route=route_id)
+            points_str = ''
+            for cur_object in route_attractions_list:
+                cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
+                cur_id = cur_attraction.id
+                if cur_id in new_attractions_list:
+                    new_attractions_list.remove(cur_id)
+                else:
+                    route_attractions = RouteAttractions.objects.get(route=route_id, attraction=cur_object.attraction)
+            if len(new_attractions_list) != 0:
+                for cur_attraction in new_attractions_list:
+                    try:
+                        cur_point = int(cur_attraction)
+                        try:
+                            cur_attraction = Attractions.objects.get(id=cur_point)
+                            route_attractions = RouteAttractions()
+                            route_attractions.route = route
+                            route_attractions.attraction = cur_attraction
+                            route_attractions.save()
+                        except ObjectDoesNotExist:
+                            pass
+                    except ValueError:
+                        pass
             return redirect('/my_routs')
     return redirect('/')
 
