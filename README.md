@@ -45,4 +45,7 @@
   <li>Построить (на экран выводится построенный маршрут)</li>
  </ul>
 </div>
- 
+
+ <p>Техническая документация: https://docs.google.com/document/d/1036RsnHIlXRHhNEgeC8zKbaZFEGDilM9yqGrMYucLP0/edit</p>
+ <p>Инструкция по установке: https://docs.google.com/document/d/1LMeqQx0TgR-XotEamrzDjpOWD9zgpUf4oHeN4eD0rEw/edit</p>
+ <p>Руководство пользователя: https://docs.google.com/document/d/1H3wlnOBEqlP47dqCiUycuvEGrHqUkLa_YIKUu45kYB8/edit</p>
