@@ -272,7 +272,8 @@ def send_mes(request):
 
 @login_required
 def new_route(request):
-    city_name = request.POST.get("city_name", "Undefined")
+    global city
+    city_name = request.POST.get("city_name", city)
     return redirect(f'/create_route/{city_name}')
 
 
