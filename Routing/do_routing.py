@@ -8,6 +8,7 @@ place = f'Москва, Россия'
 mode = 'walk'
 optimizer = 'length'
 #graph = ox.graph_from_place(place, network_type=mode)
+graph = ox.load_graphml('mos.graphml')
 print('Карта загружена')
 
 
@@ -15,9 +16,9 @@ def parse_coordinates(coordinates_list):
     global graph
     nodes_list = []
     for point in coordinates_list:
-        if point is not None:
-            nearest_node = ox.distance.nearest_nodes(graph, point[1], point[0])
-            nodes_list.append(nearest_node)
+        print(point)
+        nearest_node = ox.distance.nearest_nodes(graph, float(point['longitude']), float(point['latitude']))
+        nodes_list.append(nearest_node)
     return nodes_list
 
 

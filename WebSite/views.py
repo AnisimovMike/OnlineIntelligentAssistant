@@ -251,11 +251,15 @@ def routing(request, route_id=-1):
     global routs_number
     if route_id != -1:
         route_attractions_list = RouteAttractions.objects.filter(route=route_id)
-
-
-        #cur_map = get_map(coordinates)
-        #cur_map.save('map.html')
-    data = {"map_src": "map.html"}
+        coordinates = []
+        for cur_object in route_attractions_list:
+            cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
+            temp = {"longitude": cur_attraction.longitude,
+                    "latitude": cur_attraction.latitude}
+            coordinates.append(temp)
+        cur_map = get_map(coordinates)
+        cur_map.save(f'WebSite/static/map_{request.user.id}.html')
+    data = {"map_src": f"map_{request.user.id}.html"}
     routs_number += 1
     return render(request, "routing.html", context=data)
 
