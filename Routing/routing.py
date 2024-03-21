@@ -114,4 +114,5 @@ def find_path(graph, nodes_list, optimizer):
         new_path = path_matrix[start_index - 1][end_index - 1]
         deleted_element = new_path.pop(len(new_path) - 1)
         result_path += new_path
+    print(result_path)
     return result_path
