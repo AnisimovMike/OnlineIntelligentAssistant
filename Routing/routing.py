@@ -2,14 +2,56 @@ import osmnx as ox
 import networkx as nx
 
 
-def Min(lst, myindex):
+def matrix_min(lst, myindex):
     return min(x for idx, x in enumerate(lst) if idx != myindex)
 
 
-def Delete(matrix, index1, index2):
+def delete(matrix, index1, index2):
     del matrix[index1]
     for i in matrix:
         del i[index2]
+    return matrix
+
+
+def print_matrix(matrix):
+    print("---------------")
+    for i in range(len(matrix)):
+        temp = ''
+        for j in range(len(matrix)):
+            if matrix[i][j] != float('inf'):
+                temp += '\t' + str(int(matrix[i][j]))
+            else:
+                temp += '\t' + str(matrix[i][j])
+        print(temp)
+    print("---------------")
+
+
+def find_existing_paths(new_point, existing_paths):
+    start_list = [cur_path[0] for cur_path in existing_paths]
+    end_list = [cur_path[1] for cur_path in existing_paths]
+    if (new_point[1] in start_list) and (new_point[0] in end_list):
+        cur_start_index = end_list.index(new_point[0])
+        cur_end_index = start_list.index(new_point[1])
+        existing_paths[cur_start_index] = (existing_paths[cur_start_index][0], existing_paths[cur_end_index][1])
+        del existing_paths[cur_end_index]
+    elif (new_point[1] in start_list) and (new_point[0] not in end_list):
+        cur_index = start_list.index(new_point[1])
+        existing_paths[cur_index] = (new_point[0], end_list[cur_index])
+    elif (new_point[1] not in start_list) and (new_point[0] in end_list):
+        cur_index = end_list.index(new_point[0])
+        existing_paths[cur_index] = (start_list[cur_index], new_point[1])
+    else:
+        existing_paths.append((new_point[0], new_point[1]))
+    return existing_paths
+
+def set_inf_values(matrix, row_numbers, col_numbers, existing_paths):
+    for cur_path in existing_paths:
+        row_point = cur_path[0]-1
+        col_point = cur_path[1]-1
+        if (row_point in col_numbers) and (col_point in row_numbers):
+            NewIndex1 = row_numbers.index(col_point)
+            NewIndex2 = col_numbers.index(row_point)
+            matrix[NewIndex1][NewIndex2] = float('inf')
     return matrix
 
 
@@ -19,16 +61,17 @@ def find_path(graph, nodes_list, optimizer):
     matrix = []
     path_matrix = []
     H = 0
-    PathLenght = 0
-    Str = []
-    Stb = []
+    path_lenght = 0
+    row_numbers = []
+    col_numbers = []
     res = []
     result = []
-    StartMatrix = []
+    start_matrix = []
+    existing_paths = []
 
     for i in range(n):
-        Str.append(i)
-        Stb.append(i)
+        row_numbers.append(i)
+        col_numbers.append(i)
         matrix.append([float('inf') for x in range(n)])
         path_matrix.append(['' for x in range(n)])
 
@@ -43,7 +86,7 @@ def find_path(graph, nodes_list, optimizer):
             path_matrix[j][i] = list(reversed(cur_shortest_path))
 
     for i in range(n):
-        StartMatrix.append(matrix[i].copy())
+        start_matrix.append(matrix[i].copy())
 
     while True:
         for i in range(len(matrix)):
@@ -65,24 +108,21 @@ def find_path(graph, nodes_list, optimizer):
         for i in range(len(matrix)):
             for j in range(len(matrix)):
                 if matrix[i][j] == 0:
-                    tmp = Min(matrix[i], j) + Min((row[j] for row in matrix), i)
+                    tmp = matrix_min(matrix[i], j) + matrix_min((row[j] for row in matrix), i)
                     if tmp >= NullMax:
                         NullMax = tmp
                         index1 = i
                         index2 = j
 
-        res.append(Str[index1] + 1)
-        res.append(Stb[index2] + 1)
+        new_point = (row_numbers[index1] + 1, col_numbers[index2] + 1)
+        existing_paths = find_existing_paths(new_point, existing_paths)
+        matrix = set_inf_values(matrix, row_numbers, col_numbers, existing_paths)
+        res.append(row_numbers[index1] + 1)
+        res.append(col_numbers[index2] + 1)
 
-        oldIndex1 = Str[index1]
-        oldIndex2 = Stb[index2]
-        if oldIndex2 in Str and oldIndex1 in Stb:
-            NewIndex1 = Str.index(oldIndex2)
-            NewIndex2 = Stb.index(oldIndex1)
-            matrix[NewIndex1][NewIndex2] = float('inf')
-        del Str[index1]
-        del Stb[index2]
-        matrix = Delete(matrix, index1, index2)
+        del row_numbers[index1]
+        del col_numbers[index2]
+        matrix = delete(matrix, index1, index2)
         if len(matrix) == 1:
             break
 
@@ -99,10 +139,10 @@ def find_path(graph, nodes_list, optimizer):
 
     for i in range(0, len(result) - 1, 2):
         if i == len(result) - 2:
-            PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
-            PathLenght += StartMatrix[result[i + 1] - 1][result[0] - 1]
+            path_lenght += start_matrix[result[i] - 1][result[i + 1] - 1]
+            path_lenght += start_matrix[result[i + 1] - 1][result[0] - 1]
         else:
-            PathLenght += StartMatrix[result[i] - 1][result[i + 1] - 1]
+            path_lenght += start_matrix[result[i] - 1][result[i + 1] - 1]
 
     result.append(result[-1])
     result.append(result[0])
