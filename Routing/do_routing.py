@@ -1,5 +1,6 @@
 import osmnx as ox
 import networkx as nx
+import folium
 from Routing.routing import find_path
 from WebSite.models import Attractions
 
@@ -39,8 +40,14 @@ def set_nodes():
             attraction.save()
 
 
-def get_map(nodes_list):
+def get_map(nodes_list, object_list):
     global graph
     result_path = find_path(graph, nodes_list, optimizer)
     shortest_route_map = ox.plot_route_folium(graph, result_path)
+    for cur_object in object_list:
+        iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
+        folium.Marker(
+            location=[cur_object['latitude'], cur_object['longitude']],
+            popup=folium.Popup(iframe, max_width=2650),
+            tooltip=cur_object['name']).add_to(shortest_route_map)
     return shortest_route_map
