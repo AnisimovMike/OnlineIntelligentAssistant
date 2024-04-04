@@ -9,6 +9,7 @@ class Attractions(models.Model):
     latitude = models.CharField(max_length=100, null=True, default=None)
     longitude = models.CharField(max_length=100, null=True, default=None)
     short_description = models.TextField(null=True, default=None)
+    nearest_node = models.IntegerField(null=True, default=None)
 
 
 class AttractionTags(models.Model):

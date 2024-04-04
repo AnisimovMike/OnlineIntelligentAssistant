@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import math
 import pandas as pd
 from Routing.coordinates import get_coordinates
-from Routing.do_routing import get_map
+from Routing.do_routing import get_map, get_nearest_node, set_nodes
 from TextAnalysis.descriptions import get_description
 from TextAnalysis.create_tags import create_tag_by_name, create_tag_location
 
@@ -251,15 +251,14 @@ def routing(request, route_id=-1):
     global routs_number
     if route_id != -1:
         route_attractions_list = RouteAttractions.objects.filter(route=route_id)
-        coordinates = []
+        nodes_list = []
         for cur_object in route_attractions_list:
             cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
-            temp = {"longitude": cur_attraction.longitude,
-                    "latitude": cur_attraction.latitude}
-            coordinates.append(temp)
-        cur_map = get_map(coordinates)
+            nodes_list.append(cur_attraction.nearest_node)
+        cur_map = get_map(nodes_list)
         cur_map.save(f'WebSite/static/map_{request.user.id}.html')
     data = {"map_src": f"map_{request.user.id}.html"}
+    #data = {"map_src": "map_None.html"}
     routs_number += 1
     return render(request, "routing.html", context=data)
 
@@ -418,6 +417,7 @@ def add_attraction(request):
             attraction.latitude = latitude
             attraction.longitude = longitude
             attraction.short_description = short_description
+            attraction.nearest_node = get_nearest_node(longitude, latitude)
             attraction.save()
     return render(request, 'add_attraction.html', {'form': form})
 
@@ -432,4 +432,6 @@ def create_tags(request):
             create_tag_by_name(monument_names_list, 'parks')
         elif '_location' in request.POST:
             create_tag_location()
+        elif '_nodes' in request.POST:
+            set_nodes()
     return render(request, 'create_tags.html')

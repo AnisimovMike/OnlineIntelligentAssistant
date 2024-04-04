@@ -1,6 +1,7 @@
 import osmnx as ox
 import networkx as nx
 from Routing.routing import find_path
+from WebSite.models import Attractions
 
 
 print('Загружаю карту')
@@ -22,9 +23,24 @@ def parse_coordinates(coordinates_list):
     return nodes_list
 
 
-def get_map(coordinates):
+def get_nearest_node(longitude, latitude):
+    nearest_node = ox.distance.nearest_nodes(graph, float(longitude), float(latitude))
+    return nearest_node
+
+
+def set_nodes():
+    object_list = Attractions.objects.filter()
+    list_len = len(object_list)
+    for i in range(list_len):
+        cur_id = object_list[i].id
+        if object_list[i].nearest_node is None:
+            attraction = Attractions.objects.get(id=cur_id)
+            attraction.nearest_node = get_nearest_node(attraction.longitude, attraction.latitude)
+            attraction.save()
+
+
+def get_map(nodes_list):
     global graph
-    nodes_list = parse_coordinates(coordinates)
     result_path = find_path(graph, nodes_list, optimizer)
     shortest_route_map = ox.plot_route_folium(graph, result_path)
     return shortest_route_map
