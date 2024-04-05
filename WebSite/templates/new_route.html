@@ -3,7 +3,8 @@
 {% block p5 %}active{% endblock p5 %}
 {% block head_block %}
     <style>
-    .monument, .parks, .div_location1, .div_location2, .div_location3,
+    .monument, .parks,
+    .div_location1, .div_location2, .div_location3,
     .div_location4, .div_location5, .div_location6,
     .div_location7, .div_location8, .div_location9,
     .div_location10, .div_location11, .div_location1{
@@ -77,7 +78,7 @@
       <div class="container">
         <div class="row no-gutters slider-text align-items-end">
           <div class="col-md-9 ftco-animate pb-5">
-          	<p class="breadcrumbs mb-2"><span class="mr-2"><a href="index.html">Домашняя страница <i class="ion-ios-arrow-forward"></i></a></span> <span>Мои маршруты <i class="ion-ios-arrow-forward"></i></span></p>
+          	<p class="breadcrumbs mb-2"><span class="mr-2"><a href="/">Домашняя страница <i class="ion-ios-arrow-forward"></i></a></span> <span>Мои маршруты <i class="ion-ios-arrow-forward"></i></span></p>
             <h1 class="mb-0 bread">Мои маршруты</h1>
           </div>
         </div>
@@ -94,7 +95,7 @@
           </div>
         </div>
     	<div class="container">
-            <div class="row">
+            <div class="row justify-content-start py-5">
                 <form method="POST" class="contact-form">
                     {% csrf_token %}
                 <table>
@@ -103,10 +104,18 @@
                 <input type="submit" value="Сохранить" class="form-control submit px-3">
                 </form>
             </div>
+            <div class="row justify-content-start py-5">
+                <div class="col-md-12 pl-md-5">
+                    <span class="subheading">Для добавления достопримечательности в маршрут можешь воспользоваться поисковиком</span>
+                    <div class="form-group d-flex">
+                        <input type="text" id="search_input" class="form-control pl-3" placeholder="Что хочешь увидеть?">
+                        <button class="form-control" id="button"><span class="fa fa-search"></span></button>
+                    </div>
+                    <div id="div_output" class="col-md-12 pl-md-5"></div>
+                </div>
+            </div>
         </div>
     </section>
-
-    <br>
 
     <section class="ftco-section ftco-no-pt ftco-no-pb">
     	<div class="container">
@@ -445,6 +454,41 @@
                 return val + cur_id + ") " + n + "\n";
             });
         }
+        function search_attractions(){
+
+            var p = document.getElementById("test_p");
+            p.innerHTML = "asdf";
+        }
     </script>
+    <script type="text/javascript">
+        var button = document.getElementById("button");
+        button.onclick = function() {
+          var d = document.getElementById("div_output");
+          var get_search_input = document.getElementById('search_input').value;
+          get_search_input = get_search_input.toLowerCase();
+          d.innerHTML = '';
+          {% for element in collection %}
+          var attraction_name = "{{ element.name|escapejs }}";
+          attraction_name = attraction_name.toLowerCase();
+          if (attraction_name.includes(get_search_input)){
+            d.insertAdjacentHTML("beforeend",
+          `<div class="row">
+            <div class="col-md-8">
+                <h5 class="font-weight-bold">{{ element.name }}</h5>
+                <p>{{ element.address }}</p>
+                <p>{{ element.tags|join:", " }}</p>
+                <button class="btn btn-info" style="background-color: #fdbe34"
+                        onclick="numFix_ts({{ element.id }},'{{ element.name }}')">Добавить в маршрут</button>
+            </div>
+            <div class="col-md-4">
+                <p>{{ element.city }}</p>
+            </div>
+           </div>`);
+          }
+          {% endfor %}
+
+        }
+    </script>
+
 
 {% endblock content %}

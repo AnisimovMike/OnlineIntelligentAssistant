@@ -10,7 +10,7 @@ place = f'Москва, Россия'
 mode = 'walk'
 optimizer = 'length'
 #graph = ox.graph_from_place(place, network_type=mode)
-graph = ox.load_graphml('mos.graphml')
+#graph = ox.load_graphml('mos.graphml')
 print('Карта загружена')
 
 
