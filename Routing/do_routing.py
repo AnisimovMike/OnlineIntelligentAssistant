@@ -10,7 +10,7 @@ place = f'Москва, Россия'
 mode = 'walk'
 optimizer = 'length'
 #graph = ox.graph_from_place(place, network_type=mode)
-#graph = ox.load_graphml('mos.graphml')
+graph = ox.load_graphml('mos.graphml')
 print('Карта загружена')
 
 
@@ -44,6 +44,18 @@ def get_map(nodes_list, object_list):
     global graph
     result_path = find_path(graph, nodes_list, optimizer)
     shortest_route_map = ox.plot_route_folium(graph, result_path)
+    for cur_object in object_list:
+        iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
+        folium.Marker(
+            location=[cur_object['latitude'], cur_object['longitude']],
+            popup=folium.Popup(iframe, max_width=2650),
+            tooltip=cur_object['name']).add_to(shortest_route_map)
+    return shortest_route_map
+
+
+def update_map(object_list):
+    global graph
+    shortest_route_map = ox.plot_route_folium(graph, [])
     for cur_object in object_list:
         iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
         folium.Marker(

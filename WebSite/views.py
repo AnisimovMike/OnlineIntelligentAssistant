@@ -4,12 +4,13 @@ from django.contrib.auth import authenticate, login, get_user_model
 from .models import Attractions, AttractionTags, UserRoute, RouteAttractions, UserMess
 from .forms import LoginForm, UserRegistrationForm, RouteForm, AttractionForm
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.contrib.auth.models import User
 
 
 import math
 import pandas as pd
 from Routing.coordinates import get_coordinates
-from Routing.do_routing import get_map, get_nearest_node, set_nodes
+from Routing.do_routing import get_map, get_nearest_node, set_nodes, update_map
 from TextAnalysis.descriptions import get_description
 from TextAnalysis.create_tags import create_tag_by_name, create_tag_location
 
@@ -374,70 +375,91 @@ def registration(request):
     return render(request, 'registration.html', {'user_form': user_form})
 
 
+@login_required
 def add_attraction(request):
     global city
-    form = AttractionForm()
-    if request.method == 'POST':
-        name = request.POST.get("name")
-        img_link = request.POST.get("img_link")
-        address = request.POST.get("address")
-        latitude = request.POST.get("latitude")
-        longitude = request.POST.get("longitude")
-        short_description = request.POST.get("short_description")
-        if (address == '') and (latitude == '') and (longitude == '') and (short_description == ''):
-            print('1')
-            form = AttractionForm(initial={'name': name,
-                                           'img_link': img_link})
-            try:
-                cur_address = get_coordinates(name)
-            except TimeoutError:
+    cur_user = User.objects.get(id=request.user.id)
+    if cur_user.is_superuser == 1:
+        form = AttractionForm()
+        if request.method == 'POST':
+            name = request.POST.get("name")
+            img_link = request.POST.get("img_link")
+            address = request.POST.get("address")
+            latitude = request.POST.get("latitude")
+            longitude = request.POST.get("longitude")
+            short_description = request.POST.get("short_description")
+            if (address == '') and (latitude == '') and (longitude == '') and (short_description == ''):
+                print('1')
+                form = AttractionForm(initial={'name': name,
+                                               'img_link': img_link})
                 try:
                     cur_address = get_coordinates(name)
                 except TimeoutError:
-                    print('Адрес не найден')
+                    try:
+                        cur_address = get_coordinates(name)
+                    except TimeoutError:
+                        print('Адрес не найден')
+                        return render(request, 'add_attraction.html', {'form': form})
+                if cur_address[0] is not None:
+                    form = AttractionForm(initial={'name': name,
+                                                   'img_link': img_link,
+                                                   'address': cur_address[0],
+                                                   'latitude': cur_address[1],
+                                                   'longitude': cur_address[2]})
                     return render(request, 'add_attraction.html', {'form': form})
-            if cur_address[0] is not None:
+                else:
+                    form = AttractionForm()
+                    return render(request, 'add_attraction.html', {'form': form})
+            elif (address != '') and (latitude != '') and (longitude != '') and (short_description == ''):
+                description = get_description(name, city)
                 form = AttractionForm(initial={'name': name,
                                                'img_link': img_link,
-                                               'address': cur_address[0],
-                                               'latitude': cur_address[1],
-                                               'longitude': cur_address[2]})
+                                               'address': address,
+                                               'latitude': latitude,
+                                               'longitude': longitude,
+                                               'short_description': description})
                 return render(request, 'add_attraction.html', {'form': form})
-            else:
-                form = AttractionForm()
-                return render(request, 'add_attraction.html', {'form': form})
-        elif (address != '') and (latitude != '') and (longitude != '') and (short_description == ''):
-            description = get_description(name, city)
-            form = AttractionForm(initial={'name': name,
-                                           'img_link': img_link,
-                                           'address': address,
-                                           'latitude': latitude,
-                                           'longitude': longitude,
-                                           'short_description': description})
-            return render(request, 'add_attraction.html', {'form': form})
-        elif (address != '') and (latitude != '') and (longitude != '') and (short_description != ''):
-            attraction = Attractions()
-            attraction.name = name
-            attraction.img_link = img_link
-            attraction.address = address
-            attraction.latitude = latitude
-            attraction.longitude = longitude
-            attraction.short_description = short_description
-            attraction.nearest_node = get_nearest_node(longitude, latitude)
-            attraction.save()
-    return render(request, 'add_attraction.html', {'form': form})
+            elif (address != '') and (latitude != '') and (longitude != '') and (short_description != ''):
+                attraction = Attractions()
+                attraction.name = name
+                attraction.img_link = img_link
+                attraction.address = address
+                attraction.latitude = latitude
+                attraction.longitude = longitude
+                attraction.short_description = short_description
+                attraction.nearest_node = get_nearest_node(longitude, latitude)
+                attraction.save()
+        return render(request, 'add_attraction.html', {'form': form})
+    else:
+        return redirect('/')
 
 
+@login_required
 def create_tags(request):
-    if request.POST:
-        if '_monument' in request.POST:
-            monument_names_list = ['памятник', 'монумент', 'бюст', 'скульптура', 'фонтан']
-            create_tag_by_name(monument_names_list, 'monument')
-        elif '_parks' in request.POST:
-            monument_names_list = ['парк', 'сад']
-            create_tag_by_name(monument_names_list, 'parks')
-        elif '_location' in request.POST:
-            create_tag_location()
-        elif '_nodes' in request.POST:
-            set_nodes()
-    return render(request, 'create_tags.html')
+    cur_user = User.objects.get(id=request.user.id)
+    if cur_user.is_superuser == 1:
+        if request.POST:
+            if '_monument' in request.POST:
+                monument_names_list = ['памятник', 'монумент', 'бюст', 'скульптура', 'фонтан']
+                create_tag_by_name(monument_names_list, 'monument')
+            elif '_parks' in request.POST:
+                monument_names_list = ['парк', 'сад']
+                create_tag_by_name(monument_names_list, 'parks')
+            elif '_location' in request.POST:
+                create_tag_location()
+            elif '_nodes' in request.POST:
+                set_nodes()
+            elif '_update_map' in request.POST:
+                object_list = []
+                attractions_list = Attractions.objects.filter()
+                for cur_attraction in attractions_list:
+                    temp = {"latitude": cur_attraction.latitude,
+                            "longitude": cur_attraction.longitude,
+                            "short_description": cur_attraction.short_description,
+                            "name": cur_attraction.name}
+                    object_list.append(temp)
+                cur_map = update_map(object_list)
+                cur_map.save(f'WebSite/static/map_all.html')
+        return render(request, 'create_tags.html')
+    else:
+        return redirect('/')
