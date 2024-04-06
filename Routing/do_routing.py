@@ -56,11 +56,11 @@ def get_map(nodes_list, object_list):
 
 def update_map(object_list):
     global graph
-    map = folium.Map(location=[55.7535926, 37.6214893], zoom_start=14, tiles="openstreetmap")
+    map_all = folium.Map(location=[55.7535926, 37.6214893], zoom_start=14, tiles="openstreetmap")
     for cur_object in object_list:
         iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
         folium.Marker(
             location=[cur_object['latitude'], cur_object['longitude']],
             popup=folium.Popup(iframe, max_width=2650),
-            tooltip=cur_object['name']).add_to(map)
-    return map
+            tooltip=cur_object['name']).add_to(map_all)
+    return map_all
