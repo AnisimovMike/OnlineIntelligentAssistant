@@ -43,7 +43,8 @@ def set_nodes():
 def get_map(nodes_list, object_list):
     global graph
     result_path = find_path(graph, nodes_list, optimizer)
-    shortest_route_map = ox.plot_route_folium(graph, result_path)
+    shortest_route_map = ox.plot_route_folium(graph, result_path,
+                                              tiles='openstreetmap')
     for cur_object in object_list:
         iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
         folium.Marker(
@@ -55,11 +56,11 @@ def get_map(nodes_list, object_list):
 
 def update_map(object_list):
     global graph
-    shortest_route_map = ox.plot_route_folium(graph, [])
+    map = folium.Map(location=[55.7535926, 37.6214893], zoom_start=14, tiles="openstreetmap")
     for cur_object in object_list:
         iframe = folium.IFrame(html=f"<p>{cur_object['short_description']}</p>", width=200, height=200)
         folium.Marker(
             location=[cur_object['latitude'], cur_object['longitude']],
             popup=folium.Popup(iframe, max_width=2650),
-            tooltip=cur_object['name']).add_to(shortest_route_map)
-    return shortest_route_map
+            tooltip=cur_object['name']).add_to(map)
+    return map
