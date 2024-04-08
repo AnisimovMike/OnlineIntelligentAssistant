@@ -325,6 +325,8 @@ def create_route(request):
             tags = AttractionTags.objects.filter(attraction=cur_obj.id)
             tags_list = [cur_tag.tag for cur_tag in tags]
             name = cur_obj.name
+            while '\u0301' in name:
+                name = name.replace('\u0301', '')
             address = cur_obj.address
             cur_id = cur_obj.id
             temp = {"name": name,
