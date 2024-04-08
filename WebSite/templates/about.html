@@ -150,6 +150,94 @@
     	</div>
     </section>
 
-    <br><br>
+    <section class="ftco-section">
+    	<div class="container">
+            <h1 class="font-weight-bold">Инструкция</h1>
+    		<div class="row">
+    			<div class="col-md-8">
+    				<h3 class="font-weight-bold">Мои маршруты</h3>
+    				<p>Используя главное меню вы можете попасть на страницу "Мои маршруты".</p>
+                    <p>На странице размещена форма для создания нового маршрута и список, ваших сохранённых маршрутов,
+                        для создания нового маршрута нажмите "Поехали" в форме, для открытия страницы маршрута нажмите на его название.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/new_route.png' %}" alt="создать новый маршрут" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/routes_1.png' %}" alt="список моих маршрутов" >
+    			</div>
+    			<div class="col-md-4">
+                    <p>Вы можете создавать и сохранять свои маршруты. Сервис предоставит вам описание входящих в него
+                        достопримечательностей и построит оптимальный трек через выбранные точки.</p>
+                </div>
+    		</div>
+            <div class="row">
+    			<div class="col-md-8">
+    				<h3 class="font-weight-bold">Рекомендации</h3>
+    				<p>Используя главное меню вы можете попасть на страницу "Рекомендации".</p>
+                    <p>На странице размещён список рекомендованных маршрутов.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/routes_2.png' %}" alt="список рекомендованных маршрутов" >
+    			</div>
+    			<div class="col-md-4">
+    				<p>Мы предоставляем вам несколько маршрутов, что могут вас заинтересовать. Вы можете открыть страницу маршрута так же как и ваш собственный, но не можете его отредактировать или удалить.</p>
+    			</div>
+    		</div>
+            <div class="row">
+    			<div class="col-md-8">
+    				<h3 class="font-weight-bold">Карта</h3>
+    				<p>Используя главное меню вы можете попасть на страницу "Карты".</p>
+                    <p>На странице размещён список всех доступных вам маршрутов и интерактивная карта с отмеченными достопримечательностями.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/routes_3.png' %}" alt="список маршрутов" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/map.png' %}" alt="карта со всеми достопримечательностями" >
+    			</div>
+    			<div class="col-md-4">
+    				<p>Вы можете выбрать и построить свой или один из рекомендованных маршрутов, а также увидеть на интерактивной карте маркеры интересных достопримечательностей.</p>
+    			</div>
+    		</div>
+            <div class="row">
+    			<div class="col-md-8">
+    				<h3 class="font-weight-bold">Новый маршрут</h3>
+    				<p>Нажмите кнопку "Поехали" чтобы создать новый маршрут</p>
+                    <p>Вы можете ввести название и описание маршрута самостоятельно. Чтобы добавить достопримечательность
+                        из списка или найденный поиском, нажмите "Добавить в маршрут".</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/create_new_route.png' %}" alt="форма нового маршрута" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/create_new_route_search.png' %}" alt="Поиск достопримечательностей" >
+                    <p>Если вы не знаете что посмотреть вы можете выбрать из списка, вы можете использовать теги.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/attractions_all.png' %}" alt="все достопримечательности" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/attractions_tags.png' %}" alt="достопримечательности по тегам" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/attractions_tags_location.png' %}" alt="достопримечательности по расположению" >
+    			</div>
+    			<div class="col-md-4">
+                    <p>Вы можете открыть страницу своего маршрута, редактировать, удалить или построить его на карте.</p>
+    			</div>
+    		</div>
+            <div class="row">
+    			<div class="col-md-8">
+    				<h3 class="font-weight-bold">Страница маршрута</h3>
+    				<p>Нажмите на название маршрута, чтобы открыть страницу маршрута, оно выделено жёлтым.</p>
+                    <p>Вы можете построить трек по любому маршруту, вы можете редактировать и удалять свои маршруты.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/cur_route_1.png' %}" alt="current route" >
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/cur_route_2.png' %}" alt="current route" >
+                    <p>Форма для редактирования сразу заполнена старыми данными.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/edit_route.png' %}" alt="редактирование маршрута" >
+                    <p>Нажмите кнопку "Построить" чтобы построить трек, это может занять некоторое время.</p>
+                    <img style="display: block;margin: 0 auto;max-width: 100%;"
+                         src="{% static 'images/route_map.jpg' %}" alt="редактирование маршрута" >
+    			</div>
+    			<div class="col-md-4">
+                    <p>Вы можете открыть страницу своего маршрута, редактировать, удалить или построить его на карте.</p>
+    			</div>
+    		</div>
+    	</div>
+    </section>
 
 {% endblock content %}
