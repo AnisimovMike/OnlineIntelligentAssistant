@@ -15,6 +15,18 @@
       </div>
     </section>
 
+    <section class="ftco-section">
+    	<div class="container">
+    		<div class="row">
+    			<div class="col-md-8">
+    				<h5 class="font-weight-bold">Ваш маршрут построен</h5>
+    				<p>Длина - {{ path_lenght }}</p>
+                    <p>Время - {{ cur_time }}</p>
+    			</div>
+    		</div>
+    	</div>
+    </section>
+
     <iframe src="{% static map_src %}" width=100% style="min-height: 1000px"></iframe>
 
 {% endblock content %}
