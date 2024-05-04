@@ -82,6 +82,7 @@ def find_path(graph, nodes_list, optimizer, time, coordinates_list):
     for x in coordinates_list:
         d = ((lat_center-x[0])**2 + (lon_center-x[1])**2)**(0.5)
         distance_list.append(d)
+    start_distance_list = distance_list.copy()
 
     for i in range(n):
         row_numbers.append(i)
@@ -164,8 +165,6 @@ def find_path(graph, nodes_list, optimizer, time, coordinates_list):
         result.append(result[0])
         cur_time = path_lenght/66 + cur_n*5
         if cur_time <= time:
-            print(f'cur_time - {cur_time}')
-            print(f'time - {time}')
             time = -1
         if time == -1:
             break
@@ -176,15 +175,23 @@ def find_path(graph, nodes_list, optimizer, time, coordinates_list):
             col_numbers = []
             res = []
             result = []
-            matrix = start_matrix.copy()
+            distance_list = start_distance_list.copy()
+            matrix = []
+            for row in start_matrix:
+                temp_row = row.copy()
+                matrix.append(temp_row)
             existing_paths = []
             for i in range(n):
                 row_numbers.append(i)
                 col_numbers.append(i)
             cur_n -= 1
+            if cur_n == 1:
+                time = -1
+                cur_n = n
             for i in range(n-cur_n):
                 max_d = max(distance_list)
                 cur_index = distance_list.index(max_d)
+                del distance_list[cur_index]
                 del row_numbers[cur_index]
                 del col_numbers[cur_index]
                 matrix = delete(matrix, cur_index, cur_index)

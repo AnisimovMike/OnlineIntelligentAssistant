@@ -260,6 +260,7 @@ def routing(request, route_id=-1):
     global city
     global routs_number
     time = request.GET.get("time")
+    time = float(time)
     if route_id != -1:
         route_attractions_list = RouteAttractions.objects.filter(route=route_id)
         nodes_list = []
@@ -268,7 +269,7 @@ def routing(request, route_id=-1):
         for cur_object in route_attractions_list:
             cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
             nodes_list.append(cur_attraction.nearest_node)
-            coordinates_list.append((cur_attraction.latitude, cur_attraction.longitude))
+            coordinates_list.append((float(cur_attraction.latitude), float(cur_attraction.longitude)))
             temp = {"latitude": cur_attraction.latitude,
                     "longitude": cur_attraction.longitude,
                     "short_description": cur_attraction.short_description,
@@ -277,8 +278,8 @@ def routing(request, route_id=-1):
         cur_map, cur_time, path_lenght = get_map(nodes_list, object_list, time, coordinates_list)
         cur_map.save(f'WebSite/static/map_{request.user.id}.html')
         data = {"map_src": f"map_{request.user.id}.html",
-                "cur_time": cur_time,
-                "path_lenght": path_lenght}
+                "cur_time": int(cur_time),
+                "path_lenght": int(path_lenght)}
         #data = {"map_src": "map_None.html"}
         routs_number += 1
         return render(request, "routing.html", context=data)
