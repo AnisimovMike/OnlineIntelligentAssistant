@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, get_user_model
 from .models import Attractions, AttractionTags, UserRoute, RouteAttractions, UserMess
-from .forms import LoginForm, UserRegistrationForm, RouteForm, AttractionForm
+from .forms import LoginForm, UserRegistrationForm, RouteForm, AttractionForm, CurRouteForm
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import User
 
@@ -131,7 +131,9 @@ def cur_route(request, route_id):
                 "address": cur_attraction.address,
                 "description": cur_attraction.short_description}
         collection.append(temp)
-    data = {"name": name, "city": city, "text": text, "collection": collection, "id": route_id, "is_user": is_user}
+    form = CurRouteForm()
+    data = {"name": name, "city": city, "text": text, "collection": collection,
+            "id": route_id, "is_user": is_user, "form": form}
     return render(request, "cur_route.html", context=data)
 
 
@@ -186,7 +188,14 @@ def patch_route(request, route_id):
             route.delete()
             return redirect('/my_routs')
         elif '_make_route' in request.POST:
-            return redirect(f'/routing/{route_id}')
+            time = request.POST.get("max_time")
+            try:
+                time = int(time)
+            except ValueError:
+                time = -1
+            if time < 30:
+                time = -1
+            return redirect(f'/routing/{route_id}?time={time}')
         else:
             route_id = request.POST.get("route_id")
             route = UserRoute.objects.get(id=route_id)
@@ -250,24 +259,31 @@ def choose_route(request):
 def routing(request, route_id=-1):
     global city
     global routs_number
+    time = request.GET.get("time")
     if route_id != -1:
         route_attractions_list = RouteAttractions.objects.filter(route=route_id)
         nodes_list = []
         object_list = []
+        coordinates_list = []
         for cur_object in route_attractions_list:
             cur_attraction = Attractions.objects.get(id=cur_object.attraction.id)
             nodes_list.append(cur_attraction.nearest_node)
+            coordinates_list.append((cur_attraction.latitude, cur_attraction.longitude))
             temp = {"latitude": cur_attraction.latitude,
                     "longitude": cur_attraction.longitude,
                     "short_description": cur_attraction.short_description,
                     "name": cur_attraction.name}
             object_list.append(temp)
-        cur_map = get_map(nodes_list, object_list)
+        cur_map, cur_time, path_lenght = get_map(nodes_list, object_list, time, coordinates_list)
         cur_map.save(f'WebSite/static/map_{request.user.id}.html')
-    data = {"map_src": f"map_{request.user.id}.html"}
-    #data = {"map_src": "map_None.html"}
-    routs_number += 1
-    return render(request, "routing.html", context=data)
+        data = {"map_src": f"map_{request.user.id}.html",
+                "cur_time": cur_time,
+                "path_lenght": path_lenght}
+        #data = {"map_src": "map_None.html"}
+        routs_number += 1
+        return render(request, "routing.html", context=data)
+    else:
+        return redirect('/routing')
 
 
 def send_mes(request):

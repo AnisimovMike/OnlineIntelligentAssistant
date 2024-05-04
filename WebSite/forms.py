@@ -40,3 +40,6 @@ class RouteForm(forms.Form):
         attrs={'placeholder': 'Адрес или название 1\nАдрес или название 2\nАдрес или название 3\nи т.д.'}))
     route_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
 
+
+class CurRouteForm(forms.Form):
+    max_time = forms.IntegerField(label='Время маршрута в минутах', required=False)

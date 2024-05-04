@@ -40,9 +40,9 @@ def set_nodes():
             attraction.save()
 
 
-def get_map(nodes_list, object_list):
+def get_map(nodes_list, object_list, time, coordinates_list):
     global graph
-    result_path = find_path(graph, nodes_list, optimizer)
+    result_path, cur_time, path_lenght = find_path(graph, nodes_list, optimizer, time, coordinates_list)
     shortest_route_map = ox.plot_route_folium(graph, result_path,
                                               tiles='openstreetmap')
     for cur_object in object_list:
@@ -51,7 +51,7 @@ def get_map(nodes_list, object_list):
             location=[cur_object['latitude'], cur_object['longitude']],
             popup=folium.Popup(iframe, max_width=2650),
             tooltip=cur_object['name']).add_to(shortest_route_map)
-    return shortest_route_map
+    return shortest_route_map, cur_time, path_lenght
 
 
 def update_map(object_list):
